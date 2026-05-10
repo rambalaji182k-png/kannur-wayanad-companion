@@ -28,9 +28,9 @@ jobs:
             mv MainActivity.kt app/src/main/java/com/travel/kannurwayanad/MainActivity.kt
           fi
 
-          # Create Android Manifest
+          # Create Android Manifest (Removed deprecated package attribute)
           cat << 'EOF' > app/src/main/AndroidManifest.xml
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.travel.kannurwayanad">
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET"/>
               <application android:label="Trip Companion" android:theme="@android:style/Theme.Material.Light.NoActionBar">
                   <activity android:name=".MainActivity" android:exported="true">
@@ -73,7 +73,7 @@ jobs:
           }
           EOF
 
-          # Create app build.gradle.kts
+          # Create app build.gradle.kts (CORRECTED: Enforced Java 17 for both Java and Kotlin)
           cat << 'EOF' > app/build.gradle.kts
           plugins {
               id("com.android.application")
@@ -91,6 +91,14 @@ jobs:
               }
               buildFeatures { compose = true }
               composeOptions { kotlinCompilerExtensionVersion = "1.4.3" }
+              
+              compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = "17"
+              }
           }
           dependencies {
               implementation("androidx.core:core-ktx:1.12.0")
