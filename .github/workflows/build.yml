@@ -43,7 +43,10 @@ jobs:
           </manifest>
           EOF
 
-          # CORRECTED: Added pluginManagement block to tell Gradle to find Android plugins in Google's servers
+          # Create gradle.properties and enable AndroidX
+          echo "android.useAndroidX=true" > gradle.properties
+
+          # Set up settings.gradle.kts
           cat << 'EOF' > settings.gradle.kts
           pluginManagement {
               repositories {
