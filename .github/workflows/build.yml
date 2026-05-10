@@ -3,7 +3,7 @@ name: Generate Trip APK
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: # Allows you to trigger the build manually
+  workflow_dispatch:
 
 jobs:
   build:
@@ -19,12 +19,16 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Automatically generates standard build files so you don't have to write them
       - name: Initialize Android Project Files
         run: |
-          mkdir -p app/src/main
+          mkdir -p app/src/main/java/com/travel/kannurwayanad
           
-          # Create a basic Android Manifest
+          # Force move MainActivity to correct folder if misplaced
+          if [ -f MainActivity.kt ]; then
+            mv MainActivity.kt app/src/main/java/com/travel/kannurwayanad/MainActivity.kt
+          fi
+
+          # Create Android Manifest
           cat << 'EOF' > app/src/main/AndroidManifest.xml
           <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.travel.kannurwayanad">
               <uses-permission android:name="android.permission.INTERNET"/>
@@ -78,8 +82,15 @@ jobs:
           }
           EOF
 
+      # This step installs a generic gradle binary on the system 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.2
+
+      # Run compile task using global gradle binary (no wrapper needed!)
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: gradle :app:assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
