@@ -43,8 +43,24 @@ jobs:
           </manifest>
           EOF
 
-          # CORRECTED: Use Kotlin DSL syntax with double quotes and parentheses
-          echo 'include(":app")' > settings.gradle.kts
+          # CORRECTED: Added pluginManagement block to tell Gradle to find Android plugins in Google's servers
+          cat << 'EOF' > settings.gradle.kts
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          include(":app")
+          EOF
           
           # Create root build.gradle.kts
           cat << 'EOF' > build.gradle.kts
@@ -82,7 +98,7 @@ jobs:
           }
           EOF
 
-      # This step installs a generic gradle binary on the system 
+      # Setup Gradle 8.2 environment
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
